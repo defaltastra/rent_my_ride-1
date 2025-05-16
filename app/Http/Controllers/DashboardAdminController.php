@@ -82,15 +82,16 @@ class DashboardAdminController extends Controller
 
             // Réservations par mois
             $reservationsByMonth = Reservation::select(
-                    DB::raw('MONTH(created_at) as month'),
-                    DB::raw('COUNT(*) as count')
-                )
-                ->whereYear('created_at', now()->year)
-                ->groupBy('month')
-                ->orderBy('month')
-                ->get()
-                ->pluck('count', 'month')
-                ->toArray();
+                DB::raw('MONTH(created_at) as month'),
+                DB::raw('COUNT(*) as count')
+            )
+            ->whereYear('created_at', now()->year)
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->pluck('count', 'month')
+            ->toArray();
+            
 
             // Remplissage des mois manquants
             $completeReservationsByMonth = array_fill(1, 12, 0);

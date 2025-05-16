@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import AdminNavbar from '@/Components/AdminNavbar';
-
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 const DashboardAdmin = () => {
     const [stats, setStats] = useState({
         reservationsToday: 0,
@@ -21,12 +21,27 @@ const DashboardAdmin = () => {
     const fetchStats = async () => {
         try {
             const response = await axios.get('/admin/stats');
-            setStats(response.data);
+            const data = response.data;
+    
+            if (data.reservationsByMonth && typeof data.reservationsByMonth === 'object' && !Array.isArray(data.reservationsByMonth)) {
+                const arr = Array(12).fill(0);
+                Object.entries(data.reservationsByMonth).forEach(([month, count]) => {
+                    const index = parseInt(month, 10) - 1;
+                    if (index >= 0 && index < 12) {
+                        arr[index] = count;
+                    }
+                });
+                data.reservationsByMonth = arr;
+            }
+    
+            setStats(data);
             setLoading(false);
         } catch (error) {
             console.error('Erreur de chargement des stats:', error);
         }
     };
+    
+    
 
     useEffect(() => {
         fetchStats();
@@ -43,7 +58,16 @@ const DashboardAdmin = () => {
         date.setMonth(monthNumber - 1);
         return date.toLocaleString('fr-FR', { month: 'short' });
     };
-
+    const reservationsArray = Array.isArray(stats.reservationsByMonth)
+    ? stats.reservationsByMonth
+    : Array.from({ length: 12 }, () => 0);
+  
+  const chartData = reservationsArray.map((count, index) => ({
+    month: getMonthName(index + 1),
+    reservations: count,
+  }));
+  
+      
     const formatMAD = (amount) => {
         return new Intl.NumberFormat('fr-FR', {
             style: 'currency',
@@ -207,27 +231,22 @@ const DashboardAdmin = () => {
 
                 {/* Graphique des réservations par mois */}
                 <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.2 }}
-                    className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white/20 lg:col-span-2"
-                >
-                    <h3 className="text-[#2c3e50]/80 text-sm font-medium mb-4">Réservations par Mois</h3>
-                    <div className="flex items-end space-x-2 h-64">
-                        {Object.entries(stats.reservationsByMonth).map(([month, count]) => (
-                            <div key={month} className="flex flex-col items-center flex-1">
-                                <div 
-                                    className="w-full rounded-t-sm"
-                                    style={{ 
-                                        height: `${(count / Math.max(1, ...Object.values(stats.reservationsByMonth))) * 80}%`,
-                                        background: `linear-gradient(to top, ${['#f9d5b3', '#f0c1a0', '#d1b7b5', '#b7c7d6', '#9cb3c5'][month % 5]}, ${['#f0c1a0', '#d1b7b5', '#b7c7d6', '#9cb3c5', '#f9d5b3'][month % 5]})`
-                                    }}
-                                ></div>
-                                <span className="text-xs mt-2 text-[#2c3e50]/60">{getMonthName(parseInt(month) + 1)}</span>
-                            </div>
-                        ))}
-                    </div>
-                </motion.div>
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: 0.2 }}
+      className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6 border border-white/20 lg:col-span-2"
+      style={{ width: '100%', height: 300 }}
+    >
+      <h3 className="text-[#2c3e50]/80 text-sm font-medium mb-4">Réservations par Mois</h3>
+      <ResponsiveContainer width="100%" height="80%">
+        <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+          <YAxis />
+          <Tooltip formatter={(value) => [value, 'Réservations']} />
+          <Bar dataKey="reservations" fill="#f9d5b3" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
+    </motion.div>
             </div>
         </div>
         </>

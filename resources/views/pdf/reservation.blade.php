@@ -1,114 +1,140 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="UTF-8" />
     <title>Reçu de Réservation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* lighter gray for better contrast */
         }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #f9d5b3 0%, #f0c1a0 25%, #d1b7b5 50%, #b7c7d6 75%, #9cb3c5 100%);
+
+        .header-bg {
+            background: linear-gradient(135deg, #6b7280, #374151); /* soft dark gradient */
+            color: #f9fafb;
         }
-        
+
         .logo {
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            max-height: 56px;
+            max-width: 56px;
         }
-        
-        .hover-effect {
-            transition: all 0.3s ease;
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+            width: 100%;
         }
-        
-        .hover-effect:hover {
-            background-color: rgba(249, 213, 179, 0.06);
+
+        th {
+            font-weight: 600;
+            color: #6b7280;
+            padding-bottom: 0.25rem;
+            text-align: left;
+        }
+
+        td {
+            background: #f9fafb;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem; /* rounded corners for each cell */
+            box-shadow: 0 1px 3px rgb(0 0 0 / 0.05);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            user-select: none;
+        }
+
+        .status-confirmed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .divider {
+            height: 3px;
+            background: linear-gradient(90deg, #fbbf24, #f97316);
+            border-radius: 9999px;
+            margin-top: 2rem;
+            margin-left: auto;
+            margin-right: auto;
+            width: 80px;
         }
     </style>
 </head>
-<body class="bg-[#f5f7fa] p-8">
-    <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-        <!-- Header with gradient background -->
-        <div class="gradient-bg p-8 text-center">
-            <div class="flex justify-center items-center mb-4">
-                <img 
-                    src="https://img.icons8.com/fluency/96/000000/car-rental.png" 
-                    alt="Logo location voiture"
-                    class="logo h-16 w-16"
-                />
+<body class="p-8">
+    <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <!-- Header -->
+        <div class="bg-black p-6 text-center">
+            <div class="bg-white inline-block px-6 py-4 rounded-lg shadow">
+                <h1 class="text-3xl font-bold tracking-tight text-black">Reçu de Réservation</h1>
+                <p class="mt-1 text-sm font-semibold text-black">{{ now()->format('d/m/Y') }}</p>
             </div>
-            <h1 class="text-3xl font-bold text-white">
-                Reçu de Réservation
-            </h1>
-            <p class="mt-2 text-white/90">
-                Date: {{ now()->format('d/m/Y') }}
-            </p>
         </div>
+        
 
-        <!-- Content -->
-        <div class="p-8">
-            <div class="mb-8">
-                <h2 class="text-2xl font-semibold text-[#2c3e50] mb-4 pb-2 border-b-2 border-[#d1b7b5]">
-                    Détails de la Réservation
-                </h2>
-                
-                <div class="overflow-hidden rounded-lg border border-[#b7c7d6]">
-                    <table class="min-w-full divide-y divide-[#d1b7b5]">
-                        <tbody class="bg-white divide-y divide-[#d1b7b5]">
-                            <tr class="hover-effect">
-                                <th class="px-6 py-4 text-left text-sm font-medium text-[#6a7b8c]">Voiture</th>
-                                <td class="px-6 py-4 text-sm text-[#2c3e50]">{{ $reservation->car->nom }}</td>
-                            </tr>
-                            
-                            <tr class="hover-effect">
-                                <th class="px-6 py-4 text-left text-sm font-medium text-[#6a7b8c]">Date de début</th>
-                                <td class="px-6 py-4 text-sm text-[#2c3e50]">{{ \Carbon\Carbon::parse($reservation->start_date)->format('d/m/Y') }}</td>
-                            </tr>
-                            
-                            <tr class="hover-effect">
-                                <th class="px-6 py-4 text-left text-sm font-medium text-[#6a7b8c]">Date de fin</th>
-                                <td class="px-6 py-4 text-sm text-[#2c3e50]">{{ \Carbon\Carbon::parse($reservation->end_date)->format('d/m/Y') }}</td>
-                            </tr>
-                            
-                            <tr class="hover-effect">
-                                <th class="px-6 py-4 text-left text-sm font-medium text-[#6a7b8c]">Prix par jour</th>
-                                <td class="px-6 py-4 text-sm text-[#2c3e50]">{{ number_format($reservation->car->prix_par_jour, 2, ',', ' ') }} €</td>
-                            </tr>
-                            
-                            <tr class="hover-effect">
-                                <th class="px-6 py-4 text-left text-sm font-medium text-[#6a7b8c]">Prix total</th>
-                                <td class="px-6 py-4 text-sm text-[#2c3e50]">{{ number_format($reservation->total_price, 2, ',', ' ') }} €</td>
-                            </tr>
-                            
-                            <tr class="hover-effect">
-                                <th class="px-6 py-4 text-left text-sm font-medium text-[#6a7b8c]">Statut</th>
-                                <td class="px-6 py-4 text-sm font-medium text-[#2c3e50]">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium 
-                                        {{ $reservation->status === 'confirmed' ? 'bg-green-100 text-green-800' : 
-                                           ($reservation->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800') }}">
-                                        {{ ucfirst($reservation->status) }}
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Thank you section -->
-            <div class="text-center mt-12">
-                <p class="text-lg text-[#6a7b8c] mb-2">
-                    Merci pour votre confiance.
-                </p>
-                <p class="text-sm text-[#9cb3c5]">
-                    Ce document est un reçu officiel de votre réservation.
-                </p>
-                
-                <div class="mt-6">
-                    <div class="h-1 bg-gradient-to-r from-[#f9d5b3] via-[#d1b7b5] to-[#9cb3c5] rounded-full"></div>
-                </div>
+        <!-- Body -->
+        <div class="p-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b border-gray-200 pb-2">Détails de la Réservation</h2>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Voiture</th>
+                        <td>{{ $reservation->car->nom }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de début</th>
+                        <td>{{ \Carbon\Carbon::parse($reservation->start_date)->format('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date de fin</th>
+                        <td>{{ \Carbon\Carbon::parse($reservation->end_date)->format('d/m/Y') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Prix par jour</th>
+                        <td>{{ number_format($reservation->car->prix_par_jour, 2, ',', ' ') }} €</td>
+                    </tr>
+                    <tr>
+                        <th>Prix total</th>
+                        <td>{{ number_format($reservation->total_price, 2, ',', ' ') }} €</td>
+                    </tr>
+                    <tr>
+                        <th>Statut</th>
+                        <td>
+                            <span
+                                class="status
+                                {{ $reservation->status === 'confirmed' ? 'status-confirmed' : '' }}
+                                {{ $reservation->status === 'pending' ? 'status-pending' : '' }}
+                                {{ $reservation->status === 'cancelled' ? 'status-cancelled' : '' }}
+                                ">
+                                {{ ucfirst($reservation->status) }}
+                            </span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Footer Note -->
+            <div class="text-center mt-10">
+                <p class="text-gray-600 text-base mb-1">Merci pour votre confiance.</p>
+                <p class="text-gray-400 text-sm">Ce document est un reçu officiel de votre réservation.</p>
+                <div class="divider"></div>
             </div>
         </div>
     </div>
